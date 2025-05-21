@@ -248,3 +248,13 @@ footer {
         margin-top: 15px;
     }
 }
+/* Добавьте это в конец файла styles.css */
+
+.clear-btn {
+    background-color: #e74c3c;
+    color: white;
+}
+
+.clear-btn:hover {
+    background-color: #c0392b;
+}
