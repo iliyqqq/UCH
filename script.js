@@ -1,35 +1,49 @@
-// Инициализация данных из localStorage или создание массива по умолчанию
-let products = JSON.parse(localStorage.getItem("products")) || [
-    { name: "Молочный коктейль" },
-    { name: "Смузи" }
-];
-
-// Функция для сохранения данных в localStorage
-function saveToLocalStorage() {
-    localStorage.setItem("products", JSON.stringify(products));
+// Проверка поддержки localStorage
+function isLocalStorageSupported() {
+    try {
+        const testKey = '__test__';
+        localStorage.setItem(testKey, testKey);
+        localStorage.removeItem(testKey);
+        return true;
+    } catch (e) {
+        console.error('localStorage не поддерживается:', e);
+        return false;
+    }
 }
 
-// Функция для отрисовки всех продуктов
-function renderProducts() {
-    const container = document.getElementById('productsContainer');
-    container.innerHTML = '';
+// Инициализация данных
+let products = [];
 
-    products.forEach((product, index) => {
-        const productCard = document.createElement('div');
-        productCard.className = 'product-card';
-        productCard.innerHTML = `
-            <button class="delete-btn" onclick="deleteProduct(${index})">×</button>
-            <div class="product-image">${product.name}</div>
-            <div class="product-info">
-                <h3>${product.name}</h3>
-                <button class="order-btn">Заказать</button>
-            </div>
-        `;
-        container.appendChild(productCard);
-    });
+function initProducts() {
+    if (isLocalStorageSupported()) {
+        const stored = localStorage.getItem("products");
+        products = stored ? JSON.parse(stored) : [
+            { name: "Молочный коктейль" },
+            { name: "Смузи" }
+        ];
+    } else {
+        // Fallback: используем обычный массив
+        products = [
+            { name: "Молочный коктейль" },
+            { name: "Смузи" }
+        ];
+        alert("Ваши данные не будут сохраняться между сеансами");
+    }
 }
 
-// Функция добавления нового продукта
+// Сохранение данных
+function saveProducts() {
+    if (isLocalStorageSupported()) {
+        try {
+            localStorage.setItem("products", JSON.stringify(products));
+        } catch (e) {
+            console.error('Ошибка сохранения:', e);
+        }
+    }
+}
+
+// Остальные функции остаются без изменений, но добавляем saveProducts():
+
 function addProduct() {
     const input = document.getElementById('newProductName');
     const productName = input.value.trim();
@@ -37,32 +51,33 @@ function addProduct() {
     if (productName) {
         products.push({ name: productName });
         input.value = '';
-        saveToLocalStorage();
+        saveProducts(); // <-- Добавлено
         renderProducts();
     } else {
         alert('Пожалуйста, введите название продукта');
     }
 }
 
-// Функция удаления продукта
 function deleteProduct(index) {
     if (confirm('Вы уверены, что хотите удалить этот продукт из меню?')) {
         products.splice(index, 1);
-        saveToLocalStorage();
+        saveProducts(); // <-- Добавлено
         renderProducts();
     }
 }
 
-// Функция очистки всех данных
 function clearAll() {
-    if (confirm('Вы уверены, что хотите полностью очистить меню? Это действие нельзя отменить.')) {
-        localStorage.removeItem("products");
+    if (confirm('Вы уверены, что хотите полностью очистить меню?')) {
+        if (isLocalStorageSupported()) {
+            localStorage.removeItem("products");
+        }
         products = [];
         renderProducts();
     }
 }
 
-// Инициализация при загрузке страницы
+// Инициализация при загрузке
 document.addEventListener('DOMContentLoaded', function() {
+    initProducts();
     renderProducts();
 });
