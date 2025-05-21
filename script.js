@@ -1,8 +1,13 @@
-// Массив продуктов
-let products = [
+// Инициализация данных из localStorage или создание массива по умолчанию
+let products = JSON.parse(localStorage.getItem("products")) || [
     { name: "Молочный коктейль" },
     { name: "Смузи" }
 ];
+
+// Функция для сохранения данных в localStorage
+function saveToLocalStorage() {
+    localStorage.setItem("products", JSON.stringify(products));
+}
 
 // Функция для отрисовки всех продуктов
 function renderProducts() {
@@ -32,6 +37,7 @@ function addProduct() {
     if (productName) {
         products.push({ name: productName });
         input.value = '';
+        saveToLocalStorage();
         renderProducts();
     } else {
         alert('Пожалуйста, введите название продукта');
@@ -42,6 +48,16 @@ function addProduct() {
 function deleteProduct(index) {
     if (confirm('Вы уверены, что хотите удалить этот продукт из меню?')) {
         products.splice(index, 1);
+        saveToLocalStorage();
+        renderProducts();
+    }
+}
+
+// Функция очистки всех данных
+function clearAll() {
+    if (confirm('Вы уверены, что хотите полностью очистить меню? Это действие нельзя отменить.')) {
+        localStorage.removeItem("products");
+        products = [];
         renderProducts();
     }
 }
