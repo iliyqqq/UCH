@@ -44,6 +44,8 @@ function renderProducts() {
         const card = document.createElement('div');
         card.className = 'product-card';
         card.innerHTML = `
+    <div class="product-image" alt="${product.name}">${product.name}</div>
+`;
             <button class="delete-btn" onclick="deleteProduct(${index})">×</button>
             <div class="product-image">${product.name}</div>
             <div class="product-info">
